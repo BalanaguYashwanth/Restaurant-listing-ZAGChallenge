@@ -1,14 +1,14 @@
 const express = require('express')
-const validateToken = require('../middleware/validateToken')
+const validateTokenAndAccess = require('../middleware/validateTokenAndAccess')
 const { getRestaurants, createRestaurant, restaurant, updateRestaurant, deleteRestaurant } = require('../controllers/listingController')
 
 const router = express.Router()
 
-router.get('/', validateToken, getRestaurants)
-router.get('/:id', validateToken, restaurant)
-router.post('/', validateToken, createRestaurant)
-router.put('/:id', validateToken, updateRestaurant)
-router.delete('/:id', validateToken, deleteRestaurant)
+router.get('/', validateTokenAndAccess, getRestaurants)
+router.get('/:id', validateTokenAndAccess, restaurant)
+router.post('/', validateTokenAndAccess, createRestaurant)
+router.put('/:id', validateTokenAndAccess, updateRestaurant)
+router.delete('/:id', validateTokenAndAccess, deleteRestaurant)
 
 
 module.exports = router;

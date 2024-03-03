@@ -1,6 +1,10 @@
 const { default: mongoose } = require("mongoose");
 
 const listingSchema = mongoose.Schema({
+    rating : {
+        type: Number,
+        default: 0,
+    },
     name:{
         type: String,
         unique: true,

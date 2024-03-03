@@ -3,7 +3,7 @@ const Auth = require('../models/authModel');
 const { ACCESS_TOKEN_SECRET } = require('../constants');
 const { roleAccess } = require('../config/roleAccess');
 
-const validateToken = (req, res, next) => {
+const validateTokenAndAccess = (req, res, next) => {
     try{
         const {baseUrl, method, headers} = req;
         let authHeader = headers.authorization || headers.Authorization;
@@ -39,11 +39,11 @@ const checkAccess = async ({baseUrl, method, user}) => {
     const {role} = await Auth.findOne({_id: user.id})
     const [pathSlash, pathName] = baseUrl.split('/')
     const permissionMethodsArray = roleAccess[role][pathName]
-    if(permissionMethodsArray.includes(method)){
+    if(permissionMethodsArray?.includes(method)){
         return true
     }else{
        return false
     }
 }
 
-module.exports = validateToken
+module.exports = validateTokenAndAccess

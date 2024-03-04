@@ -20,6 +20,10 @@ Open [http://localhost:5000](http://localhost:5000) with your browser to see the
 
 https://documenter.getpostman.com/view/30058115/2sA2xcZuW4
 
+## Hosted API URL
+
+https://restaurant-listing-zagchallenge-production.up.railway.app
+
 ## Production 🚨
 
 ```

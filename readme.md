@@ -16,6 +16,10 @@ npm run dev
 
 Open [http://localhost:5000](http://localhost:5000) with your browser to see the result.
 
+## Postman collection
+
+https://documenter.getpostman.com/view/30058115/2sA2xcZuW4
+
 ## Production 🚨
 
 ```

@@ -58,7 +58,7 @@ const updateCommentAndRatings = async (restaurantId, reviews, user, userComment,
 const updateRelyForReview = async (restaurantId, user, reviews, reply) => {
     const { role } = await authModel.findById(user.id);
     const {_id} = await listingModel.findOne({"owner.id": user?.id}) || {}
-    if(_id.toString() === restaurantId){
+    if(_id?.toString() === restaurantId){
         if (role === roles.owner) {
             const index = reviews.findIndex(review => review.id === reply.userId);
             reviews[index].reply = {

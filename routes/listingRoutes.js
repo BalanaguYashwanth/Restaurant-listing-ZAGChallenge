@@ -4,8 +4,8 @@ const { getRestaurants, createRestaurant, restaurant, updateRestaurant, deleteRe
 
 const router = express.Router()
 
-router.get('/', validateTokenAndAccess, getRestaurants)
-router.get('/:id', validateTokenAndAccess, restaurant)
+router.get('/', getRestaurants)
+router.get('/:id', restaurant)
 router.post('/', validateTokenAndAccess, createRestaurant)
 router.put('/:id', validateTokenAndAccess, updateRestaurant)
 router.delete('/:id', validateTokenAndAccess, deleteRestaurant)

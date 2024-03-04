@@ -1,6 +1,7 @@
 const { roles } = require('../../config/roleAccess');
 const authModel = require('../../models/authModel');
 const reviewsModel = require('../../models/reviewModel')
+const listingModel = require('../../models/listingModel');
 const { reCalculateAvgRatings, validateUserRating, updateAverageRatingInListings } = require("../../helpers/reviewHelpers");
 
 const updateReviews = async (req, res) => {
@@ -17,7 +18,7 @@ const updateReviews = async (req, res) => {
             const hasReviewExists = reviews.find(review => review.id === (reply ? reply.userId : user.id))
             if(hasReviewExists){
                 if(reply){
-                    await updateRelyForReview(user, reviews, reply);
+                    await updateRelyForReview(restaurantId, user, reviews, reply);
                 }
                 if(userComment || userRating){
                     updateCommentAndRatings(restaurantId, reviews, user, userComment, userRating, reviewsObj);
@@ -54,18 +55,23 @@ const updateCommentAndRatings = async (restaurantId, reviews, user, userComment,
     }
 }
 
-const updateRelyForReview = async (user, reviews, reply) => {
+const updateRelyForReview = async (restaurantId, user, reviews, reply) => {
     const { role } = await authModel.findById(user.id);
-    if (role === roles.owner) {
-        const index = reviews.findIndex(review => review.id === reply.userId);
-        reviews[index].reply = {
-            ownerId: user.id,
-            ownerName: user.username,
-            ownerEmail: user.email,
-            ownerComment: reply.comment
-        };
-    } else {
-        throw new Error('Unauthorized access');
+    const {_id} = await listingModel.findOne({"owner.id": user?.id}) || {}
+    if(_id.toString() === restaurantId){
+        if (role === roles.owner) {
+            const index = reviews.findIndex(review => review.id === reply.userId);
+            reviews[index].reply = {
+                ownerId: user.id,
+                ownerName: user.username,
+                ownerEmail: user.email,
+                ownerComment: reply.comment
+            };
+        } else {
+            throw new Error('Unauthorized access');
+        }
+    }else{
+        throw new Error('You cant reply for other restaurants');
     }
 }
 

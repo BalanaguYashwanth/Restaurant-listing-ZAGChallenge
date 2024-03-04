@@ -9,7 +9,7 @@ const checkRestaurantExistsAndAccess = async (id, user) => {
     if(restaurant){
         if(role != roles.admin){
             if(role === roles.owner && restaurant?.owner?.id != user.id){
-                throw new Error('Unauthorised access')
+                throw new Error('Not allowed to update other restaurants')
             }
         }
     }else{

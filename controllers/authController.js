@@ -6,6 +6,9 @@ const { ACCESS_TOKEN_SECRET } = require('../constants');
 const register = async (req, res) => {
   try{
     const {username, email, password, role} = req.body;
+    if(password.length<=6){
+      throw new Error('Password length should be equal or greater than 6 characters')
+    }
     const hasUserDetails = await Auth.findOne({email});
     if(hasUserDetails){
       throw new Error('Email is already exists')

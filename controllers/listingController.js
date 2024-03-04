@@ -40,6 +40,10 @@ const createRestaurant = async (req, res) => {
     try{
         const {user} = req;
         const {name, phone, city, address, Images} = req.body
+        const hasOwnerExists = await Listing.findOne({"owner.id": user.id})
+        if(hasOwnerExists){
+            throw new Error('Already your restaurant listed try with different user')
+        }
         const listed = await Listing.create({
             owner:user,
             name,

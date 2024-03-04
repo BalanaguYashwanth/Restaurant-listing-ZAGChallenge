@@ -1,6 +1,10 @@
 const { default: mongoose } = require("mongoose");
 
 const listingSchema = mongoose.Schema({
+    owner:{
+        type:Object,
+        required: true
+    },
     rating : {
         type: Number,
         default: 0,

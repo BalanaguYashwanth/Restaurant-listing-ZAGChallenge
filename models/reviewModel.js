@@ -5,13 +5,13 @@ const reviewsSchema = mongoose.Schema({
         type: Schema.Types.ObjectId, 
         ref: 'Listing'
     },
-    averageRating: Number,
+    averageRating: {
+        type: Number,
+        max:5,
+    },
     reviews:{
         type: Array,
     },
-    reply:{
-        type: Object,
-    }
 },{
     timestamps: true
 })

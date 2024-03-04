@@ -1,34 +1,47 @@
-const listingModel = require('../models/listingModel');
-const reviewsModel = require('../models/reviewModel')
+const { updateAverageRatingInListings, validateUserRating } = require('../../helpers/reviewHelpers');
+const listingModel = require('../../models/listingModel');
+const reviewsModel = require('../../models/reviewModel')
 
 const postReviews = async (req, res) => {
     try{
         const {user} = req;
         const {restaurantId} = req.params;
         const {userComment, userRating} = req.body
+        validateUserRating(userRating)
         const userInfo = {
             ...user,
             userComment,
             userRating
         }
         const reviewsObj = await reviewsModel.findOne({_id: restaurantId})
-        if(reviewsObj?.reviews){
+
+        //Already have some reviews, add one
+        if(reviewsObj?.reviews?.length){
             const data = await updateRatingAndReviews({restaurantId, reviewsObj, user, userInfo, userRating});
             res.status(200).json({message: data})
         }else{
-            const reviewData = {
-                _id: restaurantId,
-                averageRating: userRating,
-                reviews:[userInfo]
-            }
-            const response = await reviewsModel.create(reviewData)
+            //create one to restaurant
+            const response = await createRatingAndReviews(restaurantId, userRating, userInfo);
             res.status(201).json({message: response})
-            await updateAverageRatingInListings(restaurantId, userRating);
+            
         }
     }catch(error){
         res.status(400).json({message: error.message})
     }
 }
+
+const createRatingAndReviews = async (restaurantId, userRating, userInfo) => {
+    const hasRestaurentExists = await listingModel.findOne({_id: restaurantId})
+    if(hasRestaurentExists){
+        const response = await reviewsModel.updateOne({_id: restaurantId},{averageRating: userRating, reviews: [userInfo]},{upsert: true});
+        await updateAverageRatingInListings(restaurantId, userRating);
+        return response;
+    }else{
+        throw new Error('Restaurant doesnot exists might be removed')
+    }
+    
+}
+
 
 const updateRatingAndReviews = async ({restaurantId, reviewsObj, user, userInfo, userRating}) => {
     const {averageRating, reviews} = reviewsObj
@@ -45,10 +58,7 @@ const updateRatingAndReviews = async ({restaurantId, reviewsObj, user, userInfo,
     }
 }
 
-const updateAverageRatingInListings = async(restaurantId, averageRating) => {
-    await listingModel.updateOne({_id: restaurantId},{$set:{rating: averageRating}})
-}
-
 module.exports = {
     postReviews
 }
+

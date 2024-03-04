@@ -1,8 +1,18 @@
+const { roles } = require('../config/roleAccess')
+const Auth = require('../models/authModel')
 const Listing = require('../models/listingModel')
+const Reviews = require('../models/reviewModel')
 
-const checkRestaurantExists = async (id) => {
+const checkRestaurantExistsAndAccess = async (id, user) => {
     const restaurant = await Listing.findById(id)
-    if(!restaurant){
+    const {role} = await Auth.findById(user.id)
+    if(restaurant){
+        if(role != roles.admin){
+            if(role === roles.owner && restaurant?.owner?.id != user.id){
+                throw new Error('Unauthorised access')
+            }
+        }
+    }else{
         throw new Error('Restaurant is not listed in our portal')
     }
 }
@@ -12,7 +22,7 @@ const getRestaurants = async (req, res) => {
         const restaurants = await Listing.find({});
         res.status(200).json({message : restaurants})
     }catch(error){
-        res.status(400).json({message: error.message})
+        res.status(400).json({message : error.message})
     }
 }
 
@@ -22,14 +32,16 @@ const restaurant = async (req, res) => {
         const restaurant = await Listing.findById(id);
         res.status(200).json({message : restaurant})
     }catch(error){
-        res.status(400).json({message: error.message})
+        res.status(400).json({message : error.message})
     }
 }
 
 const createRestaurant = async (req, res) => {
     try{
+        const {user} = req;
         const {name, phone, city, address, Images} = req.body
         const listed = await Listing.create({
+            owner:user,
             name,
             phone,
             city,
@@ -38,16 +50,22 @@ const createRestaurant = async (req, res) => {
         })
         res.status(201).json({message : listed})
     }catch(error){
-        res.status(400).json({message: error.message})
+        res.status(400).json({message : error.message})
     }
    
 }
 
 const updateRestaurant = async (req, res) => {
     try{
+        //here id is restaurent ID
+        const {user} = req;
         const {id} = req.params
         const data = req.body
-        await checkRestaurantExists(id)
+        if(data?.rating){
+            throw new Error('You cant update the rating')
+        }
+        await checkRestaurantExistsAndAccess(id, user)
+
         await Listing.updateOne(
             {
                 _id: id
@@ -57,20 +75,23 @@ const updateRestaurant = async (req, res) => {
                     ...data
                 }
             })
-        res.status(200).json({message: 'successfully updated'})
+        res.status(200).json({message : 'successfully updated'})
     }catch(error){
-        res.status(400).json({message: error.message})
+        res.status(400).json({message : error.message})
     }   
 }
 
 const deleteRestaurant = async (req, res) => {
     try{
+        //here id is restaurent ID
+        const {user} = req;
         const {id} = req.params
-        await checkRestaurantExists(id)
+        await checkRestaurantExistsAndAccess(id, user)
         await Listing.deleteOne({_id:id})
+        await Reviews.deleteOne({_id: id})
         res.status(200).json({'message': 'succesfully deleted'})
     }catch(error){
-        res.status(400).json({message: error.message})
+        res.status(400).json({message : error.message})
     }   
 }
 

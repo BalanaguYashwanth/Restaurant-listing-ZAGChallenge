@@ -1,12 +1,15 @@
 const express = require('express')
-const { postReviews } = require('../controllers/reviewsController')
 const validateTokenAndAccess = require('../middleware/validateTokenAndAccess')
+const { postReviews } = require('../controllers/reviewsController/postReview')
+const { getReviews } = require('../controllers/reviewsController/getReviews')
+const { updateReviews } = require('../controllers/reviewsController/updateReview')
+const { deleteReview } = require('../controllers/reviewsController/deleteReview')
 
 const router = express.Router()
 
-// router.get('/:restaurantId', getReviews)
+router.get('/:restaurantId', getReviews)
 router.post('/:restaurantId', validateTokenAndAccess, postReviews)
-// router.put('/:restaurantId', updateReview)
-// router.delete('/:restaurantId', deleteReview)
+router.put('/:restaurantId', validateTokenAndAccess, updateReviews)
+router.delete('/:restaurantId', validateTokenAndAccess, deleteReview)
 
 module.exports = router

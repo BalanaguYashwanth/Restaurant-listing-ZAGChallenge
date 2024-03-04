@@ -9,10 +9,17 @@ const roleAccess = {
         },
         user:{
             listing:['GET'],
-            reviews: ['GET', 'POST', 'PUT', 'UPDATE']
+            reviews: ['GET', 'POST', 'PUT', 'DELETE']
         },
     }
 
+const roles = {
+    admin: 'admin',
+    owner:'owner',
+    user: 'user',
+
+}
 module.exports = {
+    roles,
     roleAccess
 }
